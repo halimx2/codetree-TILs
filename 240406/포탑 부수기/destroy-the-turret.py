@@ -121,22 +121,14 @@ def give_one_more_life(route) :
 if __name__ == '__main__':
     attack_time_list = [[0 for _ in range(N)] for _ in range(M)]
 
-    for _ in range(M):
-        print(TURRET_MAP[_])
-    print()
-    print('------------------------------')
-
     for _ in range(K) :
         attack_r, attack_c = find_attack_turret(attack_time_list)
         attacked_r, attacked_c = find_attacked_turret(attack_time_list, attack_r, attack_c)
-
-        print(attack_r, attack_c, attacked_r, attacked_c)
 
         route = razor_attack(attack_r, attack_c, attacked_r, attacked_c)
 
         if route :
             # 경로로 공격
-            print(route)
             attack_power = TURRET_MAP[attack_r][attack_c]
             for r,c in route :
                 if (r,c) == (attack_r, attack_c) :
@@ -148,28 +140,14 @@ if __name__ == '__main__':
 
                 TURRET_MAP[r][c] = max(TURRET_MAP[r][c]-attack_power//2, 0)
         else :
-            print('BOMB')
             route = bomb_attack(attack_r, attack_c, attacked_r, attacked_c)
 
         attack_time_list[attack_r][attack_c] = _
-
-        # 공격직후
-        print("공격직후:")
-        for _ in range(M):
-            print(TURRET_MAP[_])
-        print()
 
         route.append([attack_r, attack_c])
         route.append([attacked_r, attacked_c])
 
         give_one_more_life(route)
-
-        # 회복 후
-        print("회복 후")
-        for _ in range(M):
-            print(TURRET_MAP[_])
-        print()
-        print('----------')
 
     answer = -1
     for r in range(M) :
