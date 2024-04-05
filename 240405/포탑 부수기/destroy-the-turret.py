@@ -99,7 +99,7 @@ def bomb_attack(attack_r, attack_c, attacked_r, attacked_c) :
 
     route = []
     for dr_, dc_ in zip(dr, dc) :
-        r_, c_ = r+dr_, c+dc_
+        r_, c_ = (r+dr_)%M, (c+dc_)%N
         if TURRET_MAP[r_][c_] > 0 or (r_, c_) != (attacked_r, attacked_c) :
             TURRET_MAP[r_][c_] = max(TURRET_MAP[r_][c_]-attack_power//2, 0)
             route.append([r_, c_])
