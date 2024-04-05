@@ -22,7 +22,7 @@ def find_attack_turret(attack_time_list):
                 weakest_turret_list = [{'index': [r, c], 'time': attack_time_list[r][c]}]
 
     if len(weakest_turret_list) == 1:
-        weakest_turret_list.sort(key=lambda x: (x['time'], -sum(x['index']), -x['index'][1]))
+        weakest_turret_list.sort(key=lambda x: (-x['time'], -sum(x['index']), -x['index'][1]))
 
     r = weakest_turret_list[0]['index'][0]
     c = weakest_turret_list[0]['index'][1]
@@ -48,7 +48,7 @@ def find_attacked_turret(attack_time_list, attack_r, attack_c):
                 strongest_turret_list = [{'index': [r, c], 'time': attack_time_list[r][c]}]
 
     if len(strongest_turret_list) > 1:
-        strongest_turret_list.sort(key=lambda x: (-x['time'], sum(x['index']), x['index'][1]))
+        strongest_turret_list.sort(key=lambda x: (x['time'], sum(x['index']), x['index'][1]))
 
     return strongest_turret_list[0]['index']
 
@@ -96,7 +96,7 @@ def bomb_attack(attack_r, attack_c, attacked_r, attacked_c) :
     # print(attack_r, attack_c, attacked_r, attacked_c)
     attack_power = TURRET_MAP[attack_r][attack_c]
 
-    TURRET_MAP[attacked_r][attacked_c] -= attack_power
+    TURRET_MAP[attacked_r][attacked_c] = max(TURRET_MAP[attacked_r][attacked_c] - attack_power, 0)
 
     dr = [0, 0, 1, 1, 1, -1, -1, -1]
     dc = [1, -1, 1, -1, 0, 1, -1, 0]
@@ -121,6 +121,7 @@ def give_one_more_life(route) :
 if __name__ == '__main__':
     attack_time_list = [[0 for _ in range(N)] for _ in range(M)]
 
+ 
     for _ in range(K) :
         attack_r, attack_c = find_attack_turret(attack_time_list)
         attacked_r, attacked_c = find_attacked_turret(attack_time_list, attack_r, attack_c)
@@ -138,7 +139,7 @@ if __name__ == '__main__':
                     TURRET_MAP[r][c] = max(TURRET_MAP[r][c] - attack_power, 0)
                     continue
 
-                TURRET_MAP[r][c] = max(TURRET_MAP[r][c]-attack_power//2, 0)
+                TURRET_MAP[r][c] = max(TURRET_MAP[r][c] - attack_power//2, 0)
         else :
             route = bomb_attack(attack_r, attack_c, attacked_r, attacked_c)
 
@@ -148,6 +149,7 @@ if __name__ == '__main__':
         route.append([attacked_r, attacked_c])
 
         give_one_more_life(route)
+
 
     answer = -1
     for r in range(M) :
