@@ -142,7 +142,7 @@ if __name__ == '__main__':
         else :
             route = bomb_attack(attack_r, attack_c, attacked_r, attacked_c)
 
-        attack_time_list[attack_r][attack_c] = _
+        attack_time_list[attack_r][attack_c] = _+1
 
 
         route.append([attack_r, attack_c])
