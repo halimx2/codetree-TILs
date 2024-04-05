@@ -121,7 +121,6 @@ def give_one_more_life(route) :
 if __name__ == '__main__':
     attack_time_list = [[0 for _ in range(N)] for _ in range(M)]
 
- 
     for _ in range(K) :
         attack_r, attack_c = find_attack_turret(attack_time_list)
         attacked_r, attacked_c = find_attacked_turret(attack_time_list, attack_r, attack_c)
@@ -144,6 +143,7 @@ if __name__ == '__main__':
             route = bomb_attack(attack_r, attack_c, attacked_r, attacked_c)
 
         attack_time_list[attack_r][attack_c] = _
+
 
         route.append([attack_r, attack_c])
         route.append([attacked_r, attacked_c])
