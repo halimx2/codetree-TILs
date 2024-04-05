@@ -13,9 +13,10 @@ for _ in range(M) :
     [r,c] = list(map(int, input().split()))
     maze[r - 1][c - 1] = -1
 
+EXIT_NUM = N*N*N
 
 r,c = list(map(int, input().split()))
-maze[r - 1][c - 1] = -2
+maze[r - 1][c - 1] = EXIT_NUM
 CNT = copy.deepcopy(M)
 
 d_r = [-1, 1, 0, 0]
@@ -38,9 +39,9 @@ def move_people() :
 
     for r in range(N) :
         for c, box in enumerate(maze[r]) :
-            if box == -1 :
+            if box <= -1 :
                 people.append([r,c])
-            elif box == -2 :
+            elif box == EXIT_NUM :
                 exit_r = r
                 exit_c = c
 
@@ -48,11 +49,13 @@ def move_people() :
         for d_r_, d_c_ in zip(d_r, d_c) :
             if person_r + d_r_ < 0 or person_c + d_c_ < 0 :
                 continue
+
             try :
-                if maze[person_r+d_r_][person_c+d_c_] == -2 :
+                if maze[person_r+d_r_][person_c+d_c_] == EXIT_NUM :
+                    ANSWER_CNT += abs(maze[person_r][person_c])
+                    # print('---', maze[person_r][person_c])
                     maze[person_r][person_c] = 0
 
-                    ANSWER_CNT += 1
 
                     break
 
@@ -63,12 +66,25 @@ def move_people() :
                     continue
 
                 if maze[person_r+d_r_][person_c+d_c_] == 0 :
-                    maze[person_r][person_c] = 0
-                    maze[person_r+d_r_][person_c+d_c_] = -1
+                    maze[person_r+d_r_][person_c+d_c_] = maze[person_r][person_c]
+                    # print(maze[person_r+d_r_][person_c+d_c_])
 
-                    ANSWER_CNT += 1
+                    maze[person_r][person_c] = 0
+
+                    ANSWER_CNT += abs(maze[person_r+d_r_][person_c+d_c_])
 
                     break
+
+                elif maze[person_r+d_r_][person_c+d_c_] <= -1 :
+                    maze[person_r+d_r_][person_c+d_c_] += maze[person_r][person_c]
+                    # print(maze[person_r+d_r_][person_c+d_c_])
+
+                    maze[person_r][person_c] = 0
+
+                    ANSWER_CNT += abs(maze[person_r+d_r_][person_c+d_c_])
+
+                    break
+
             except IndexError :
                 pass
 
@@ -89,25 +105,28 @@ def find_smallest_rectangle(r, c) :
     smallest_cnt = 99999
     while q:
         [r, c, cnt] = q.popleft()
-        if r < 0 or c < 0 :
-            continue
-
+        # print([r, c, cnt])
         if cnt > smallest_cnt :
             break
+
         visited[r][c] = True
 
         for d_r_, d_c_ in zip(d_r, d_c) :
             if not(N > r+d_r_ >= 0) or not(N > c+d_c_ >= 0) :
                 continue
+
             if visited[r+d_r_][c+d_c_] :
                 continue
+
             if maze[r+d_r_][c+d_c_] == -1 :
                 answer_list.append([r+d_r_, c+d_c_])
                 smallest_cnt = cnt+1
             else :
                 q.append([r+d_r_, c+d_c_, cnt+1])
 
-    if len(answer_list) == 1 :
+    if not answer_list :
+        return [-1 ,-1]
+    elif len(answer_list) == 1 :
         return answer_list[0]
     else :
         answer_list.sort(key = lambda x:(x[0], x[1]))
@@ -127,7 +146,7 @@ def rotate_square(person_r, person_c, exit_r, exit_c) :
 
     for r_ in range(r_start, r_start+length+1) :
         for c_ in range(c_start, c_start+length+1) :
-            if maze_[r_ - r_start][c_ - c_start] in [-1, -2] :
+            if maze_[r_ - r_start][c_ - c_start] in [-1, EXIT_NUM] :
                 maze[r_][c_] = maze_[r_ - r_start][c_ - c_start]
                 continue
 
@@ -136,35 +155,27 @@ def rotate_square(person_r, person_c, exit_r, exit_c) :
 
 
 if __name__ == "__main__" :
-    # for line in maze :
-    #     print(line)
-    # print()
-
     for _ in range(K) :
         [exit_r, exit_c] = move_people()
         person_r, person_c = find_smallest_rectangle(exit_r, exit_c)
-        rotate_square(person_r, person_c, exit_r, exit_c)
 
-        one_more_time = False
-        for line in maze :
-            for temp in line :
-                if temp == -1 :
-                    one_more_time = True
-                    break
-
-        if not one_more_time :
+        if person_r == -1 and person_c == -1 :
             break
+        rotate_square(person_r, person_c, exit_r, exit_c)
 
     break_ = False
     for r in range(len(maze)) :
         for c in range(len(maze[0])) :
-            if maze[r][c] == -2 :
+            if maze[r][c] == EXIT_NUM :
                 answer = [r,c]
                 break_ = True
                 break
 
         if break_ :
             break
-            
+
+    # for _ in maze :
+    #     print(_)
+    
     print(ANSWER_CNT)
     print(answer[0]+1, answer[1]+1)
