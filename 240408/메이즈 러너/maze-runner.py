@@ -90,11 +90,14 @@ def find_smallest_square() :
         elif shortest_length == length :
             smallest_square_list.append([runner[R_IDX], runner[C_IDX]])
 
-    person_for_square = sorted(smallest_square_list, key = lambda x:(x[R_IDX], x[C_IDX]))[0]
-    down_r, down_c = sorted([person_for_square, _exit], key = lambda x:(x[0], x[1]))[-1]
+    if smallest_square_list :
+        person_for_square = sorted(smallest_square_list, key = lambda x:(x[R_IDX], x[C_IDX]))[0]
+        down_r, down_c = sorted([person_for_square, _exit], key = lambda x:(x[0], x[1]))[-1]
 
-    upper_r = 0 if down_r - shortest_length <= 0 else down_r - shortest_length
-    upper_c = 0 if down_c - shortest_length <= 0 else down_c - shortest_length
+        upper_r = 0 if down_r - shortest_length <= 0 else down_r - shortest_length
+        upper_c = 0 if down_c - shortest_length <= 0 else down_c - shortest_length
+    else:
+        print(_runner_list)
 
     return upper_r, upper_c, shortest_length
 
@@ -164,6 +167,9 @@ if __name__ == '__main__' :
         move_runners()
         # print_maze(_maze)
         # print_runner()
+
+        if not _runner_list :
+            break
 
         ## 정사각형 만들기
         upper_r, upper_c, length = find_smallest_square()
