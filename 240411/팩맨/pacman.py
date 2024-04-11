@@ -85,8 +85,8 @@ _route_list = []
 def dfs(r, c, direction_list, cnt_eating_monster):
     global _route_list
 
-    if len(direction_list) >= 3 :
-        _route_list.append([r, c, direction_list.copy(), cnt_eating_monster])
+    if len(direction_list) == 3 :
+        _route_list.append([r, c, direction_list, cnt_eating_monster])
         return 0
 
     for direction in range(4):
@@ -96,14 +96,12 @@ def dfs(r, c, direction_list, cnt_eating_monster):
         if not (0 <= r_ < 4) or not (0 <= c_ < 4):
             continue
 
-        if is_there_monster(r_, c_) :
-            cnt_eating_monster += 1
+        for monster in _monster_list :
+            if (monster[R_IDX], monster[C_IDX]) == (r_, c_) :
+                cnt_eating_monster += 1
 
-        direction_list.append(direction)
-        dfs(r_, c_, direction_list, cnt_eating_monster)
-        direction_list.pop()
-        # print('-', direction_list, cnt_eating_monster)
-        # direction_list = direction_list[:cnt]
+        # direction_list.append(direction)
+        dfs(r_, c_, direction_list + [direction], cnt_eating_monster)
 
 def packman_move() :
     global _dead_monster_list, _r_packman, _c_packman, _route_list
@@ -111,15 +109,17 @@ def packman_move() :
     _route_list = []
 
     dfs(_r_packman, _c_packman, [], 0)
-    best_route = sorted(_route_list, key = lambda x:(-x[3], x[2]))[0]
-    # print("route:", _route_list)
-    # print("best:", best_route)
+    sorted_route_list = sorted(_route_list, key = lambda x:(-x[3], x[2]))
+    best_route = sorted_route_list[0]
     remove_list = []
     for direction in best_route[2] : # direction_list
         _r_packman += _d_r_packman[direction]
         _c_packman += _d_c_packman[direction]
 
         for idx, monster in enumerate(_monster_list) :
+            if idx in remove_list :
+                continue
+
             if (monster[R_IDX], monster[C_IDX]) == (_r_packman, _c_packman):
                 remove_list.append(idx)
 
@@ -128,13 +128,8 @@ def packman_move() :
                 _dead_monster_list.append(monster)
 
     remove_list.sort(reverse=True)
-    # print("remove:", remove_list)
-    # print(remove_list)
     for idx in remove_list :
-        # print(idx)
-        # print(_monster_list)
         _monster_list.pop(idx)
-        # print(_monster_list)
 
 def print_map() :
     maze_ = [[0 for _ in range(4)] for _ in range(4)]
@@ -142,7 +137,7 @@ def print_map() :
     for r, c, d in _monster_list :
         maze_[r][c] += 1
 
-    maze_[_r_packman][_c_packman] = '-'
+    maze_[_r_packman][_c_packman] -= 10
 
     for line in maze_ :
         print(line)
@@ -171,25 +166,14 @@ def make_monster(eggs_list) :
 
 if __name__ == '__main__' :
     for round in range(T) :
-        # print_map()
         eggs_list = duplicate_monster()
 
-        # print(_monster_list)
         for idx, monster in enumerate(_monster_list) :
             monster_move(monster, idx)
-        # print(_monster_list)
-        # print()
-        # print('after monsters move')
-        # print_map()
+
         packman_move()
         remove_dead_monster()
 
         make_monster(eggs_list)
-        # print('after packman move')
-        # print(_monster_list)
-        # print_map()
-        # print('-----------')
 
     print(len(_monster_list))
-    # print_map()
-    # print(_monster_list)
